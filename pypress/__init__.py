@@ -1,25 +1,25 @@
 import app
 
 def use(route):
-	pass
+    pass
 
 def get(route):
-	pass
+    pass
 
 def post(route):
-	pass
+    pass
 
 def put(route):
-	pass
+    pass
 
 def patch(route):
-	pass
+    pass
 
 def delete(route):
-	pass
+    pass
 
 def Pypress():
-	new_app = App()
-	return new_app;
+    new_app = App()
+    return new_app;
 
 app.Application()
