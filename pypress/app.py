@@ -1,19 +1,26 @@
 import BaseHTTPServer
-from request import RequestHandler
 
 router = {}
 
 class Server(BaseHTTPServer.HTTPServer):
-    def init(self, hostname, port, application):
+    pass
+
+class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def do_GET(self):
         pass
 
+    def do_POST(self):
+        pass
+
+    def do_PUT(self):
+        pass
+
+    def do_DELETE(self):
+        pass
 
 class Application():
-    def _app(environ, start_response):
-        pass
-
     def __init__(self):
-        self.app = _app
+        pass
 
     def route(fn):
         def wrapper(*args, **kwargs):
