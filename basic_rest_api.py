@@ -12,7 +12,7 @@ things = []
 def json_body_parser(req, res, after):
     # parse json here
     req.body = json.loads(req.body)
-    after(req, res)
+    after()
 
 
 @app.get('/thing')
