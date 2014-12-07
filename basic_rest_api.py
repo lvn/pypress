@@ -1,5 +1,4 @@
 from pypress import Pypress
-import json
 
 # A basic Pypress REST API.
 
@@ -8,21 +7,12 @@ app = Pypress()
 things = []
 
 
-@app.use()
-def json_body_parser(req, res, after):
-    # parse json here
-    req.body = json.loads(req.body)
-    after()
-
-
-@app.get('/thing')
-def query_thing(req, res):
-    res.send(json.dumps(things))
+app.use(Pypress.Middleware.json_body_parser)
 
 
 @app.get('/thing/:id')
 def get_thing(req, res):
-    res.send(json.dumps(things[req.params.id]))
+    res.json(things[req.params.id])
 
 
 @app.post('/thing')
