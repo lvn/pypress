@@ -1,25 +1,5 @@
-import app
+from .app import Application
+from .router import Router
 
-def use(route):
-    pass
-
-def get(route):
-    pass
-
-def post(route):
-    pass
-
-def put(route):
-    pass
-
-def patch(route):
-    pass
-
-def delete(route):
-    pass
-
-def Pypress():
-    new_app = App()
-    return new_app;
-
-app.Application()
+Pypress = Application
+setattr(Pypress, 'Router', Router)
