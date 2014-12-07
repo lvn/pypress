@@ -1,15 +1,18 @@
-import BaseHTTPServer
+import http.server
 from .request import Request
 from .response import Response
 from .router import Router
 
 
-class PypressServer(BaseHTTPServer.HTTPServer):
+class PypressServer(http.server.HTTPServer):
     pass
 
 
-class PypressRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class PypressRequestHandler(http.server.BaseHTTPRequestHandler):
+    routes = {}
+
     def handle_request(self):
+        print(self.routes)
         pass
 
     do_GET = handle_request
@@ -21,78 +24,62 @@ class PypressRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 class Application():
     Router = Router
+    routes = {}
 
     def __init__(self):
-        self.routes = {}
+        pass
 
-    # helper method to mount middleware for the given route and method.
-    # if no method is provided, mount the middleware for all methods.
-    def _mount_middleware(self, path, middleware, method=None):
-        middleware = [m for m in middleware]
-        if not self.routes[path]:
+    # helper method for adding routes.
+    # if middleware is provided, mount the middleware at the path.
+    # if not, return a decorator that mounts the function as middleware at path.
+    def _add_route(self, path, middleware=None, method=None):
+
+        if path not in self.routes:
             self.routes[path] = {} if method else []
-        if method:
-            # mount middleware for method
-            if not self.routes[path][method]:
-                self.routes[path][method] = []
-            self.routes[path][method] += middleware
+
+        if method and (method not in self.routes[path]):
+            self.routes[path][method] = []
+
+        def add_route(f):
+            route_dict = self.routes[path][method] if method \
+                else self.routes[path]
+            route_dict.append(f)
+
+        if middleware:
+            for m in middleware:
+                add_route(m)
         else:
-            self.routes.path += middleware
+            return add_route
 
     # mount the middleware for all requests to the path.
-    def use(self, path, *middleware):
-        if middleware:
-            self._mount_middleware(path, middleware)
-        else:
-            def add_route(f):
-                self.routes[path] = f
-            return add_route
+    def use(self, path='*', *middleware):
+        return self._add_route(path, middleware)
 
     # mount the middleware for all GET requests to the path.
-    def get(self, path, *middleware):
-        if middleware:
-            self._mount_middleware(path, middleware, 'GET')
-        else:
-            def add_route(f):
-                self.routes[path] = f
-            return add_route
+    def get(self, path='*', *middleware):
+        return self._add_route(path, middleware, 'GET')
 
     # mount the middleware for all POST requests to the path.
-    def post(self, path, *middleware):
-        if middleware:
-            self.routes[path] = middleware
-        else:
-            def add_route(f):
-                self.routes[path] = f
-            return add_route
+    def post(self, path='*', *middleware):
+        return self._add_route(path, middleware, 'POST')
 
     # mount the middleware for all PUT requests to the path.
-    def put(self, path, *middleware):
-        if middleware:
-            self.routes[path] = middleware
-        else:
-            def add_route(f):
-                self.routes[path] = f
-            return add_route
+    def put(self, path='*', *middleware):
+        return self._add_route(path, middleware, 'PUT')
 
     # mount the middleware for all GET requests to the path.
-    def patch(self, path, *middleware):
-        if middleware:
-            self.routes[path] = middleware
-        else:
-            def add_route(f):
-                self.routes[path] = f
-            return add_route
+    def patch(self, path='*', *middleware):
+        return self._add_route(path, middleware, 'PATCH')
 
     # mount the middleware for all DELETE requests to the path.
-    def delete(self, path, *middleware):
-        if middleware:
-            self.routes[path] = middleware
-        else:
-            def add_route(f):
-                self.routes[path] = f
-            return add_route
+    def delete(self, path='*', *middleware):
+        return self._add_route(path, middleware, 'DELETE')
 
-    def listen(port=1337, hostname='0.0.0.0', backlog=511, callback=None):
-        server = PypressServer((hostname, port), PypressRequestHandler)
+    def route(self, path='*'):
+        pass
+
+    def listen(self, port=1337, hostname='', backlog=511, callback=None):
+        server_address = ('', 1337)
+        PypressRequestHandler.routes = self.routes
+        server = PypressServer(server_address, PypressRequestHandler)
         server.serve_forever()
