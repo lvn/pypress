@@ -12,8 +12,11 @@ class PypressRequestHandler(http.server.BaseHTTPRequestHandler):
     routes = {}
 
     def handle_request(self):
-        print(self.routes)
-        pass
+        request_obj = Request()
+        response_obj = Response()
+
+        print(str(self.headers))
+        print(str(self.path))
 
     do_GET = handle_request
     do_POST = handle_request
@@ -41,9 +44,9 @@ class Application():
             self.routes[path][method] = []
 
         def add_route(f):
-            route_dict = self.routes[path][method] if method \
+            route_middleware = self.routes[path][method] if method \
                 else self.routes[path]
-            route_dict.append(f)
+            route_middleware.append(f)
 
         if middleware:
             for m in middleware:
