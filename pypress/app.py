@@ -51,7 +51,7 @@ class Application():
         else:
             return add_route
 
-    # generates an add_route method for EVERY method.
+    # generates an add_route method for EVERY HTTP method.
     # this is for app.get, app.post, app.trace, app.mkactivity, etc.
     def _generate_add_route_method(self, method):
         add_route = self._add_route
