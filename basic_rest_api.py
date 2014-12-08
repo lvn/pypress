@@ -3,37 +3,50 @@ from pypress import Pypress
 # A basic Pypress REST API.
 
 app = Pypress()
-
+app.use(Pypress.Middleware.json_body_parser)
 things = []
 
 
-app.use(Pypress.Middleware.json_body_parser)
+@app.use()
+def convert_id_to_int(req, res, next):
+    if 'id' in req.params:
+        req.params['id'] = int(req.params['id'])
+    next()
 
 
-@app.get('/thing/:id')
+@app.get('/things/:id')
 def get_thing(req, res):
-    res.json(things[req.params.id])
+    print(req.params['id'])
+    if req.params['id'] < len(things):
+        res.json(things[req.params['id']])
+    else:
+        res.send(404)
 
 
-@app.post('/thing')
+@app.get('/things')
+def get_things(req, res):
+    res.json(things)
+
+
+@app.post('/things')
 def create_thing(req, res):
-    things.append(req.body.thing)
+    things.append(req.body['thing'])
     res.send('done')
 
 
-@app.put('/thing/:id')
+@app.put('/things/:id')
 def replace_thing(req, res):
     try:
-        things[req.params.id] = req.body.thing
+        things[req.params['id']] = req.body['thing']
         res.send('done')
     except:
         res.send(404)
 
 
-@app.delete('/thing/:id')
+@app.delete('/things/:id')
 def destroy_thing(req, res):
     try:
-        removed = things.pop(req.params.id)
+        removed = things.pop(req.params['id'])
         res.send(removed, 204)
     except:
         res.send(403)

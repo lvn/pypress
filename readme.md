@@ -4,6 +4,9 @@
 Python web microframework, heavily inspired by Express.js and Sinatra. 
 
 ## Installation
+### Installing from Pip
+1. `sudo pip install pypress`
+
 ### Building from source
 1. i dunno lol, clone the thing
 

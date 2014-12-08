@@ -1,5 +1,7 @@
 from .app import Application
 from .router import Router
+from .middleware import Middleware
 
 Pypress = Application
-setattr(Pypress, 'Router', Router)
+Pypress.Router = Router
+Pypress.Middleware = Middleware
