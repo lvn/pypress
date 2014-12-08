@@ -6,7 +6,6 @@ class Response():
     def __init__(self, request_handler):
         self.request_handler = request_handler
         mimetypes.init()
-        print(self.request_handler.path)
 
     # sets HTTP header as per given field and value.
     def set(self, field, value):
@@ -35,7 +34,6 @@ class Response():
     # sends response, status optional as 1st argument, followed by body
     def send(self, *args):
         # support for optional status code as 1st arg
-        print(args)
         if isinstance(args[0], int):
             self.res_status = args[0]
             self.body = args[1] if (len(args) > 1) else ''
@@ -47,6 +45,8 @@ class Response():
 
         self.request_handler.send_response(self.res_status)
         self.request_handler.end_headers()
+
+        self.request_handler.wfile.flush()
         self.request_handler.wfile.write(bytes(str(self.body), 'UTF-8'))
         self.request_handler.wfile.flush()
 

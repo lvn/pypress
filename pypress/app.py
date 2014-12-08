@@ -6,7 +6,7 @@ from .response import Response
 from .router import Router
 from .utils import methods
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 class PypressServer(http.server.HTTPServer):
@@ -82,7 +82,8 @@ class PypressRequestHandler(http.server.BaseHTTPRequestHandler):
             # no route match
             return False
 
-        print(middleware)
+        if DEBUG_MODE:
+            print(middleware)
         return middleware
 
     def next(self):

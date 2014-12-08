@@ -1,6 +1,6 @@
 from .utils import methods
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 class Router():
