@@ -12,14 +12,15 @@ Python web microframework, heavily inspired by Express.js and Sinatra.
 
 ## Quickstart
 Here's a very simple Hello World app:
-    
-    from pypress import Pypress
-    
-    app = Pypress()
-    
-    @app.get('/')
-    def hello (req, res):
-      res.send('Hello world!')
-    
-    app.listen(1337)
-    
+
+```python
+from pypress import Pypress
+
+app = Pypress()
+
+@app.get('/')
+def hello (req, res):
+  res.send('Hello world!')
+
+app.listen(1337)
+```
