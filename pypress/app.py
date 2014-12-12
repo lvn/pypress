@@ -144,3 +144,10 @@ class Application():
             print('routes: ', self.router.routes)
             print('app listening on %s:%s' % server_address)
             print('IT\'S ALIVE')
+
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            if DEBUG_MODE:
+                print('server stopping...')
+            sys.exit()
