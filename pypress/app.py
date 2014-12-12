@@ -1,4 +1,5 @@
 import re
+import sys
 import urllib
 import http.server
 from .request import Request
@@ -55,19 +56,18 @@ class PypressRequestHandler(http.server.BaseHTTPRequestHandler):
         # TODO: refactor to better account for *
         # TODO: handle routers
 
-        if '*' in self.routes:
-            if isinstance(self.routes['*'], dict):
-                if '*' in self.routes['*']:
-                    middleware = self.routes['*']['*'] + middleware
-                if method in self.routes['*']:
-                    middleware = self.routes['*'][method] + middleware
-            elif isinstance(self.routes['*'], Router):
-                # handle as Router object
-                pass
-
         for rule in self.routes:
             route_match = self.route_match(rule, path)
-            if rule != '*' and route_match is not False:
+            if rule == '*':
+                if isinstance(self.routes['*'], dict):
+                    if method in self.routes['*']:
+                        middleware = self.routes['*'][method] + middleware
+                    if '*' in self.routes['*']:
+                        middleware = self.routes['*']['*'] + middleware
+                elif isinstance(self.routes['*'], Router):
+                    # handle as Router object
+                    pass
+            elif route_match is not False:
                 self.params = route_match
                 if isinstance(self.routes[rule], dict):
                     if '*' in self.routes[rule]:
@@ -99,8 +99,8 @@ class PypressRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_request(self):
         if '?' in self.path:
             self.path, self.query = tuple(self.path.split('?'))
-            self.query = {param[0]: urllib.parse.unquote_plus(param[1])
-                          for param in [tuple(query_pair.split('='))
+            self.query = {key: urllib.parse.unquote_plus(val)
+                          for key, val in [tuple(query_pair.split('='))
                           for query_pair in self.query.split('&')]}
         else:
             self.query = {}
@@ -127,6 +127,9 @@ class Application():
     def __getattr__(self, name):
         return getattr(self.router, name)
 
+    def wsgi_app(environ, start_response):
+        pass
+
     def listen(self, port=1337, hostname='', backlog=511, callback=None):
         server_address = (hostname, port)
         PypressRequestHandler.routes = self.router.routes
@@ -141,4 +144,3 @@ class Application():
             print('routes: ', self.router.routes)
             print('app listening on %s:%s' % server_address)
             print('IT\'S ALIVE')
-        server.serve_forever()
