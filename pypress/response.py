@@ -5,17 +5,18 @@ import mimetypes
 class Response():
     def __init__(self, request_handler):
         self.request_handler = request_handler
+        self.headers = {}
         mimetypes.init()
 
-    # sets HTTP header as per given field and value.
     def set(self, field, value):
-        self.request_handler.send_header(field, value)
+        """Sets the HTTP header of the given field to the given value."""
+        self.headers[field] = value
 
     # header is an alias for set.
     header = set
 
-    # sets the mimetype of the response body.
     def type(self, body_type):
+        """Sets/gueses the mimetype of the response body."""
         if ('/'in body_type):
             mimetype = body_type
         else:
@@ -26,13 +27,13 @@ class Response():
             mimetype = mimetypes.guess_type(body_type)[0]
         self.set('Content-Type', mimetype)
 
-    # sets the response status
     def status(self, code):
+        """Sets the response status."""
         self.res_status = code
         return self
 
-    # sends response, status optional as 1st argument, followed by body
     def send(self, *args):
+        """Send response status and body. Status optional as 1st argument."""
         # support for optional status code as 1st arg
         if isinstance(args[0], int):
             self.res_status = args[0]
@@ -43,13 +44,15 @@ class Response():
                 # temp, should be changeable
                 self.res_status = 200 if self.body else 500
 
-        self.request_handler.send_response(self.res_status)
-        self.request_handler.end_headers()
-
-        self.request_handler.wfile.flush()
         self.request_handler.wfile.write(bytes(str(self.body), 'UTF-8'))
         self.request_handler.wfile.flush()
 
+        self.request_handler.send_response(self.res_status)
+        for field, value in self.headers.items():
+            self.request_handler.send_header(field, value)
+        self.request_handler.end_headers()
+
     def json(self, data):
+        """Sets the mimetype header to JSON before sending the response."""
         self.type('json')
         self.send(json.dumps(data))
