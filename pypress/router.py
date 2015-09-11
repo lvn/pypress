@@ -6,6 +6,7 @@ DEBUG_MODE = False
 class Router():
     def __init__(self):
         self.routes = {}
+        self.num_middleware = 0
         for method in methods:
             self._generate_add_route_method(method)
 
@@ -23,6 +24,8 @@ class Router():
         # the actual method that mounts the middleware to the route and method.
         # may be returned as a decorator.
         def add_route(f):
+            f.index = self.num_middleware
+            self.num_middleware += 1
             self.routes[path][method].append(f)
 
         if DEBUG_MODE:
