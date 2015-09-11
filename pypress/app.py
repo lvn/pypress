@@ -7,6 +7,7 @@ from .response import Response
 from .router import Router
 from .utils import methods
 
+
 DEBUG_MODE = False
 
 
@@ -120,8 +121,9 @@ class PypressRequestHandler(http.server.BaseHTTPRequestHandler):
 class Application():
     routes = {}
 
-    def __init__(self):
+    def __init__(self, **opts):
         # generates a route adder for every HTTP method.
+        self.opts = opts
         self.router = Router()
 
     def __getattr__(self, name):
